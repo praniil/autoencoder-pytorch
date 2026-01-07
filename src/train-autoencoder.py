@@ -5,11 +5,33 @@ import torchvision.transforms as transforms
 import torch.nn as nn
 from torch.utils.data import random_split
 
+class EarlyStopping:
+    def __init__(self, patience=5, delta = 0, verbose = False):
+        self.patience = patience
+        self.delta = delta
+        self.verbose = verbose
+        self.best_loss = None
+        self.no_improvement_count = 0
+        self.stop_training = False
+
+    def check_early_stop(self, val_loss):
+        if self.best_loss is None or val_loss < self.best_loss - self.delta:
+            self.best_loss = val_loss
+            self.no_improvement_count = 0
+        else:
+            self.no_improvement_count += 1
+            print(f"no improvements for {self.no_improvement_count}")
+            if self.no_improvement_count >= self.patience:
+                self.stop_training = True
+                if self.verbose:
+                    print("Stopping early as no imporovement has been observed")
+
+
 if __name__ == "__main__": 
     # hyper-params
-    batch_size = 512
+    batch_size = 128
     epochs = 100
-    learning_rate = 1e-5
+    learning_rate = 1e-3
 
     transform = transforms.Compose([transforms.ToTensor()])
 
@@ -52,17 +74,21 @@ if __name__ == "__main__":
     )
 
     val_loader = torch.utils.data.DataLoader(
-        dataset=val_dataset, batch_size=batch_size, shuffle=True, num_workers=4, pin_memory=True
+        dataset=val_dataset, batch_size=batch_size, shuffle=False, num_workers=4, pin_memory=True
     )
+
+    # init early stopping
+    early_stopping = EarlyStopping(patience=3, delta=1e-5, verbose=True)
 
     # training the network
     for epoch in range(epochs):
-        train_loss = 0
-        val_loss = 0
+        epoch_train_loss = 0.0
+        epoch_val_loss = 0.0
 
         #training phase
         model.train()
-        for batch_features, _ in train_loader:  #labels are ignored _ used
+        for batch_features, _ in train_loader: 
+         #labels are ignored _ used
             batch_features = batch_features.view(-1, 784).to(device)
 
             #reset the gradients back to zero
@@ -81,10 +107,10 @@ if __name__ == "__main__":
             optimizer.step()
 
             # mini-batch training loss and epoch loss added
-            train_loss += train_loss.item()
+            epoch_train_loss += train_loss.item()
         
         #compute the epoch training loss
-        train_loss = train_loss / len(train_loader)
+        epoch_train_loss = epoch_train_loss / len(train_loader)
 
         # validation phase
         model.eval()
@@ -99,11 +125,19 @@ if __name__ == "__main__":
                 val_loss = craiterion(batch_features, outputs)
                 
                 # mini-batch training loss and epoch loss added
-                val_loss += val_loss.item()
+                epoch_val_loss += val_loss.item()
+
+        epoch_val_loss = epoch_val_loss / len(val_loader)
 
         # display the epoch training loss
-        print("epoch : {}/{}, train loss = {:.8f}".format(epoch + 1, epochs, train_loss))   
-        print("epoch : {}/{}, val loss = {:.8f}".format(epoch + 1, epochs, val_loss))   
+        print("epoch : {}/{}, train loss = {:.8f}".format(epoch + 1, epochs, epoch_train_loss))   
+        print("epoch : {}/{}, val loss = {:.8f}".format(epoch + 1, epochs, epoch_val_loss))   
+
+        early_stopping.check_early_stop(val_loss=epoch_val_loss)
+
+        if early_stopping.stop_training:
+            print(f"Early stopiing at epoch {epoch}")
+            break
 
     # save the model
     path = "../trained-autoencoder" 
