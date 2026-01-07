@@ -31,5 +31,5 @@ class AutoEncoder(nn.Module):
         activation = self.decoder_hidden_layer(encode)
         activation = torch.relu(activation)
         activation = self.decoder_output_layer(activation)
-        reconstructed = torch.relu(activation)
+        reconstructed = torch.sigmoid(activation)
         return reconstructed
