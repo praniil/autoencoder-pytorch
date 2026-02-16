@@ -1,0 +1,48 @@
+================================================================================
+AUTOENCODER COMPARISON REPORT
+================================================================================
+
+ARCHITECTURE COMPARISON
+--------------------------------------------------------------------------------
+Metric                                   Custom AE            Library AE          
+--------------------------------------------------------------------------------
+Trainable Parameters                     234,640              234,640             
+
+PERFORMANCE METRICS
+--------------------------------------------------------------------------------
+Metric                                   Custom AE            Library AE          
+--------------------------------------------------------------------------------
+Mean Squared Error (MSE)                 0.003373             0.003751            
+Mean Absolute Error (MAE)                0.018430             0.019515            
+PSNR (dB)                                24.72                24.26               
+Inference Time (seconds)                 0.5292               0.4375              
+Samples Tested                           12,000               12,000              
+
+ANALYSIS
+--------------------------------------------------------------------------------
+• MSE Winner: Custom Autoencoder
+• MAE Winner: Custom Autoencoder
+• PSNR Winner: Custom Autoencoder (higher is better)
+• Speed Winner: Library Autoencoder
+
+• MSE Difference: 10.09%
+• PSNR Difference: 0.46 dB
+• Speed Difference: 17.33%
+
+IMPLEMENTATION COMPARISON
+--------------------------------------------------------------------------------
+Custom Autoencoder:
+  • Uses explicit nn.Module class definition
+  • Manually defines each layer in __init__
+  • Explicit forward pass with activation functions
+  • More verbose but offers finer control
+
+Library-based Autoencoder:
+  • Uses nn.Sequential containers
+  • More compact and readable code
+  • Higher-level PyTorch abstractions
+  • Easier to modify architecture
+
+================================================================================
+END OF REPORT
+================================================================================

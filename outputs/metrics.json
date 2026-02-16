@@ -1,0 +1,22 @@
+{
+    "custom_autoencoder": {
+        "model_name": "Custom Autoencoder",
+        "avg_mse": 0.0033727144996325174,
+        "avg_mae": 0.018429964666565258,
+        "avg_psnr": 24.7202042029374,
+        "inference_time": 0.5292203426361084,
+        "samples_tested": 12000
+    },
+    "library_autoencoder": {
+        "model_name": "Library Autoencoder",
+        "avg_mse": 0.0037510945989439885,
+        "avg_mae": 0.01951543420056502,
+        "avg_psnr": 24.258419832282918,
+        "inference_time": 0.43749022483825684,
+        "samples_tested": 12000
+    },
+    "architecture": {
+        "custom_parameters": 234640,
+        "library_parameters": 234640
+    }
+}
